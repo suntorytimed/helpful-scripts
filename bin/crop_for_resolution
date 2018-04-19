@@ -1,0 +1,30 @@
+#!/bin/bash
+usage() { echo "Usage: $0 -p <picture file> -f <output folder>" 1>&2; exit 1; }
+
+while getopts ":p:f:" o; do
+    case "${o}" in
+        p)
+            p=${OPTARG}
+            [[ -e "${p}" ]] || usage
+            image=${p}
+            ;;
+        f)
+            f=${OPTARG}
+            [[ -d "${f}" ]] || usage
+            folder=${f}
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+
+shift $((OPTIND-1))
+
+if [ -z "${f}" ] || [ -z "${p}" ]; then
+    usage
+fi
+
+for re in 800x600 1024x600 1024x768 1152x864 1280x720 1280x768 1280x800 1280x1024 1360x768 1366x768 1440x900 1536x864 1600x900 1680x1050 1920x1080 1920x1200 2560x1080 2560x1440 2560x1600 2880x1800 3440x1440 3840x2160 4096x2160; do
+    convert ${image} -filter Lanczos -resize ${re}^ -gravity center -crop ${re}+0+0 ${folder}/${re}.jpg;
+done
